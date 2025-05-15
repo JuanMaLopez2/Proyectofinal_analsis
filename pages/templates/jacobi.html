@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Método de Jacobi{% endblock %}
+
+{% block content %}
+<h1>Método de Jacobi</h1>
+<p>Resuelve sistemas ecuaciones Ax = b en forma matricial y no matricial</p>
+    <p>El método converge a la solución única si el radio espectral de T es menor a 1 y si A es estrictamente diagonalmente dominante.</p>
+<form method="post" id="matrixForm">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="button" onclick="generateMatrix()">Generar Matriz y Vector</button>
+    <div id="matrixInputs"></div>
+    <div id="vectorInputs"></div>
+    <button type="submit" class="btn">Calcular</button>
+</form>
+
+{% if error %}
+    <div class="error">{{ error }}</div>
+{% endif %}
+
+{% if result %}
+    <h2>Resultado:</h2>
+    <p>Solución aproximada: {{ result }}</p>
+{% endif %}
+
+{% if iterations %}
+    <h2>Tabla de Resultados:</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Iteración</th>
+                <th>Vector</th>
+                <th>Tolerancia</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in iterations %}
+                <tr>
+                    <td>{{ row.0 }}</td>
+                    <td>{{ row.1 }}</td>
+                    <td>{{ row.2 }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+<script>
+function generateMatrix() {
+    const n = document.getElementById('id_n').value;
+
+    if (!n) {
+        alert("Por favor, ingrese la dimensión de la matriz.");
+        return;
+    }
+
+    let matrixInputs = '<h3>Matriz A</h3>';
+    let vectorInputs = '<h3>Vector b</h3>';
+    let x0Inputs = '<h3>Vector x0</h3>';
+
+    for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+            matrixInputs += `<input type="text" name="A_${i}_${j}" placeholder="A[${i}][${j}]" required>`;
+        }
+        matrixInputs += '<br>';
+        vectorInputs += `<input type="text" name="b_${i}" placeholder="b[${i}]" required><br>`;
+        x0Inputs += `<input type="text" name="x0_${i}" placeholder="x0[${i}]" required><br>`;
+    }
+
+    document.getElementById('matrixInputs').innerHTML = matrixInputs;
+    document.getElementById('vectorInputs').innerHTML = vectorInputs + x0Inputs;
+}
+</script>
+{% endblock %}

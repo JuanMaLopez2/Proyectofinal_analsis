@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Método de Bisección{% endblock %}
+
+{% block content %}
+<h1>Método de Bisección</h1>
+<p>Este método parte de un intervalo dado [a,b], donde se sabe que existe al menos una raíz real para f(x)=0 , donde “f” es una función continua. Para poder aplicar este método se debe cumplir la condición f(a)*f(b) <0, lo cual implica que hay un cambio de signo dentro del intervalo </p>
+<p>Indique el intervalo, recuerde que a debe ser menor a b y que se debe cumplir la condición  f(a)*f(b) <0. </p>
+
+<form method="post">
+    <p>Indique su función f, recuerde que debe ser continua en el intervalo.</p>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn">Calcular</button>
+</form>
+
+{% if result %}
+    <h2>Resultado:</h2>
+    <p>{{ result }}</p>
+{% endif %}
+
+{% if iterations %}
+    <h2>Tabla de Resultados:</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Iteración</th>
+                <th>Xi</th>
+                <th>Xs</th>
+                <th>Xm</th>
+                <th>f(Xm)</th>
+                <th>Error</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in iterations %}
+                <tr>
+                    {% for item in row %}
+                        <td>{{ item }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+{% if image %}
+    <h2>Gráfica:</h2>
+    <img src="{{ image }}" alt="Gráfica de la función">
+{% endif %}
+
+{% endblock %}

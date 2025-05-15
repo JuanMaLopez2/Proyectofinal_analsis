@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Método de Newton Interpolante{% endblock %}
+
+{% block content %}
+<h1>Método de Newton Interpolante</h1>
+<p>El polinomio interpolador de Newton tiene la forma:</p>
+<img src="{% static 'images/newton.png' %}" alt="newton">
+<p>Ingrese los puntos (puede ser todos los x en un vector y todos los y en otro).</p>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="button" onclick="generateInputs()">Generar Matriz y Vector</button>
+    <div id="vectorInputs"></div>
+    <button type="submit" class="btn">Calcular</button>
+</form>
+
+{% if error %}
+    <div class="error">{{ error }}</div>
+{% endif %}
+
+{% if funcion %}
+    <h2>Función Interpolante:</h2>
+    <p>{{ funcion }}</p>
+{% endif %}
+
+{% if expr %}
+    <h2>Expresión:</h2>
+    <p>{{ expr }}</p>
+{% endif %}
+
+{% if image %}
+    <h2>Gráfica de la interpolación de Newton:</h2>
+    <img src="{{ image }}" alt="Gráfica de la interpolación de Newton">
+{% endif %}
+
+<script>
+function generateInputs() {
+    const n = document.getElementById('id_n').value;
+
+    let vectorInputs = '<h3>Vector xs</h3>';
+    for (let i = 0; i < n; i++) {
+        vectorInputs += `<input type="text" name="xs_${i}" placeholder="xs[${i}]" required>`;
+    }
+
+    vectorInputs += '<h3>Vector y</h3>';
+    for (let i = 0; i < n; i++) {
+        vectorInputs += `<input type="text" name="y_${i}" placeholder="y[${i}]" required>`;
+    }
+
+    document.getElementById('vectorInputs').innerHTML = vectorInputs;
+}
+</script>
+{% endblock %}
