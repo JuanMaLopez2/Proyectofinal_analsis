@@ -32,7 +32,8 @@ def ReglaF(xi,xs,tol,n,f):
             return ["Fracasó en "+str(n)+" iteraciones"]
     else:
         return ["Intervalo inadecaudo"]
-    
-    
-ReglaF(5.0,15.0,1e-6,100,x^2-100)
+
+# Ejemplo de uso:
+# f = lambda x: x**2 - 100
+# resultado = ReglaF(5.0, 15.0, 1e-6, 100, f)
     

@@ -1,3 +1,6 @@
+import numpy as np
+from prettytable import PrettyTable
+
 def gauss_seidel(A,b,x0,n,tol):
     table=PrettyTable()
     table.field_names=["Iteraciones","Vector","Tolerancia"]

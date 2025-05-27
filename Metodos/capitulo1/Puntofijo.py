@@ -1,5 +1,6 @@
 from symtable import Symbol
 import sympy
+import numpy as np
 
 x = sympy.Symbol("x")
 f = (x)**2 - 100
@@ -7,21 +8,22 @@ f = (x)**2 - 100
 def Cre_o_Decre(f,x0):
     return sympy.diff(f,x).subs(x,x0) > 0
 
-
-
-def PuntoFijo(g,x0,tol,Nmax):
-
-    #Inicialización
+def puntofijo(x0, tol, n, g):
+    # Inicialización
     xant = x0
-    E = 1000
+    error = tol + 1
     cont = 0
-
-    #Ciclo
-    while E > tol and cont < Nmax :
-        xact = g.subs(x,xant)
-        E = abs(xact-xant)
-        cont = cont + 1
+    
+    # Ciclo
+    while error > tol and cont < n:
+        xact = g(xant)
+        error = abs(xact - xant)
+        cont += 1
         xant = xact
-    return [xact,cont,E]
+    
+    if error <= tol:
+        return [xact, f"Error de {error}"]
+    else:
+        return [f"Fracasó en {n} iteraciones"]
 
-print(PuntoFijo(f,-12,0.01,100))
+print(puntofijo(-12, 0.01, 100, lambda x: (x**2 - 100)**0.5))

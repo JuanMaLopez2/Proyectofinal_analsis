@@ -1,23 +1,31 @@
-from symtable import Symbol
-import sympy
+import numpy as np
+import sympy as sp
 
-x = sympy.Symbol("x")
-f = ((x-4)**2)-100
-
-def Newton(f,x0,tol,Nmax):
-
-    xant = 0
-    fant = f.subs(x,xant)
-    E = 1000
+def newton(x0, tol, n, f):
+    x = sp.Symbol('x')
+    # Calcular la derivada simbólica
+    df = sp.diff(f, x)
+    # Convertir a funciones lambda
+    f_lambda = sp.lambdify(x, f, 'numpy')
+    df_lambda = sp.lambdify(x, df, 'numpy')
+    
+    xant = x0
+    error = tol + 1
     cont = 0
-
-    while E > tol and cont < Nmax :
-        xact = xant-fant/(sympy.diff(f,x).subs(x,xant))
-        fact = f.subs(x,xant)
-        E = abs(xact-xant)
-        cont = cont + 1
+    
+    while error > tol and cont < n:
+        if df_lambda(xant) == 0:
+            return ["Error: derivada igual a cero"]
+        xact = xant - f_lambda(xant)/df_lambda(xant)
+        error = abs(xact - xant)
+        cont += 1
         xant = xact
-        fant = fact
-    return [float(xact),cont,float(E)]
+    
+    if error <= tol:
+        return [xact, f"Error de {error}"]
+    else:
+        return [f"Fracasó en {n} iteraciones"]
 
-print(Newton(f,-10,0.001,5))
+# Prueba del método
+x = sp.Symbol('x')
+print(newton(-10, 0.001, 5, ((x-4)**2)-100))

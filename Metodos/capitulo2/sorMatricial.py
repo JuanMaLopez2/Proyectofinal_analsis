@@ -1,3 +1,5 @@
+import numpy as np
+from prettytable import PrettyTable
 def sor_matricial(A,b,x0,n,tol,w):
     table=PrettyTable()
     table.field_names=["Iteraciones","Vector","Tolerancia"]

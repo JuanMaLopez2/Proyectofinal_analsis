@@ -1,3 +1,4 @@
+from prettytable import PrettyTable
 import numpy as np
 def jacobi(A,b,x0,n,tol):
     table=PrettyTable()

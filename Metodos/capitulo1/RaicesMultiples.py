@@ -1,4 +1,4 @@
-import numpy as np 
+import numpy as np
 import sympy as sym
 
 def RaicesMul(x0,tol,n,f,derivada1,derivdad2):
