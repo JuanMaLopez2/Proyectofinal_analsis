@@ -1,11 +1,85 @@
 {% extends 'base.html' %}
 
-{% block title %}Nosotros{% endblock %}
+{% block title %}Acerca de - Métodos Numéricos{% endblock %}
 
 {% block content %}
-<h1>Nosotros</h1>
-<p>Esta página fue diseñada para el trabajo final del curso Analisis Numerico, la cual abarca distintos metodos para la solucion de problemas de este estilo.</p>
-<p>Integrantes:</p>
-<li>Juan Manuel López Sánchez</li>
-<li>Santiago Celis Loaiza</li>
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h1 class="h3 mb-0">
+                    <i class="bi bi-info-circle"></i> Acerca del Proyecto
+                </h1>
+            </div>
+            <div class="card-body">
+                <h2 class="h4 mb-3">Objetivo</h2>
+                <p class="lead">Este proyecto tiene como objetivo proporcionar una herramienta educativa interactiva para el aprendizaje y aplicación de métodos numéricos.</p>
+                
+                <h2 class="h4 mb-3 mt-4">Características Principales</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-group mb-4">
+                            <li class="list-group-item">
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                                Métodos de búsqueda de raíces
+                            </li>
+                            <li class="list-group-item">
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                                Métodos de sistemas lineales
+                            </li>
+                            <li class="list-group-item">
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                                Interpolación polinomial
+                            </li>
+                            <li class="list-group-item">
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                                Gráficas interactivas
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-group mb-4">
+                            <li class="list-group-item">
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                                Sistema de ayuda en línea
+                            </li>
+                            <li class="list-group-item">
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                                Tutoriales paso a paso
+                            </li>
+                            <li class="list-group-item">
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                                Exportación de resultados
+                            </li>
+                            <li class="list-group-item">
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                                Cálculo de errores
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h2 class="h4 mb-3 mt-4">Equipo de Desarrollo</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h3 class="h5">Autor</h3>
+                                <p>Santiago Celis Loaiza</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h3 class="h5">Asesor</h3>
+                                <p>Julian Esteban Rendón Roldán</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

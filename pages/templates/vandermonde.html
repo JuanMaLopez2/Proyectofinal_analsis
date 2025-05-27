@@ -1,49 +1,103 @@
 {% extends 'base.html' %}
-{% load static %}
-{% block title %}Método de Vandermonde{% endblock %}
+
+{% block title %}Vandermonde - Métodos Numéricos{% endblock %}
 
 {% block content %}
-<h1>Método de Vandermonde</h1>
-<p>Dados n+1 puntos, existe un único polinomio de grado a la sumo n de la forma:</p>
-    <img src="{% static 'images/vandermonde.png' %}" alt="vandermonde">
-<p>Esto resulta en un sistema de n+1 ecuaciones lineales con n+1 incógnitas donde los coeficientes a1,...,an son las incógnitas. Como se sabe p(xi)=yi, se puede construir el sistema. </p>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="button" onclick="generateInputs()">Generar Matriz y Vector</button>
-    <div id="vectorInputs"></div>
-    <button type="submit" class="btn">Calcular</button>
-</form>
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h1 class="h3 mb-0">
+                    <i class="bi bi-graph-up"></i> Método de Vandermonde
+                </h1>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle-fill"></i>
+                    El método de Vandermonde utiliza una matriz especial para encontrar el polinomio interpolante que pasa por todos los puntos dados.
+                </div>
 
-{% if funcion %}
-    <h2>Función Interpolante:</h2>
-    <p>{{ funcion }}</p>
-{% endif %}
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-light">
+                                <h2 class="h5 mb-0">Datos de Entrada</h2>
+                            </div>
+                            <div class="card-body">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label for="x_values" class="form-label">Valores de X (separados por comas)</label>
+                                        <input type="text" class="form-control" id="x_values" name="x_values" 
+                                               placeholder="Ejemplo: 1,2,3,4,5" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="y_values" class="form-label">Valores de Y (separados por comas)</label>
+                                        <input type="text" class="form-control" id="y_values" name="y_values" 
+                                               placeholder="Ejemplo: 2,4,6,8,10" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="bi bi-calculator"></i> Calcular
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-light">
+                                <h2 class="h5 mb-0">Descripción del Método</h2>
+                            </div>
+                            <div class="card-body">
+                                <p>El método de Vandermonde:</p>
+                                <ul>
+                                    <li>Construye una matriz especial llamada matriz de Vandermonde</li>
+                                    <li>Resuelve un sistema de ecuaciones lineales para encontrar los coeficientes del polinomio</li>
+                                    <li>Genera un polinomio único que pasa por todos los puntos dados</li>
+                                    <li>Es ideal para conjuntos de datos pequeños</li>
+                                </ul>
+                                <div class="alert alert-warning">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                    Nota: Para conjuntos de datos grandes, este método puede ser computacionalmente costoso.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-{% if expr %}
-    <h2>Expresión:</h2>
-    <p>{{ expr }}</p>
-{% endif %}
-
-<script>
-function generateInputs() {
-    const n = document.getElementById('id_n').value;
-
-    let vectorInputs = '<h3>Vector xs</h3>';
-    for (let i = 0; i < n; i++) {
-        vectorInputs += `<input type="text" name="xs_${i}" placeholder="xs[${i}]" required>`;
-    }
-
-    vectorInputs += '<h3>Vector y</h3>';
-    for (let i = 0; i < n; i++) {
-        vectorInputs += `<input type="text" name="y_${i}" placeholder="y[${i}]" required>`;
-    }
-
-    document.getElementById('vectorInputs').innerHTML = vectorInputs;
-}
-</script>
-{% if image %}
-    <h2>Gráfica:</h2>
-    <img src="{{ image }}" alt="Gráfica de la interpolación de Vandermonde">
-{% endif %}
+                {% if funcion %}
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h2 class="h4 mb-0">Resultados</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <h3 class="h5">Polinomio Interpolante</h3>
+                                    <div class="alert alert-info">{{ funcion }}</div>
+                                </div>
+                                {% if expr %}
+                                <div class="mb-4">
+                                    <h3 class="h5">Expresión</h3>
+                                    <div class="alert alert-info">{{ expr }}</div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {% if image %}
+                                <h3 class="h5">Gráfica</h3>
+                                <div class="text-center">
+                                    <img src="{{ image }}" class="img-fluid rounded" alt="Gráfica de la interpolación de Vandermonde">
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

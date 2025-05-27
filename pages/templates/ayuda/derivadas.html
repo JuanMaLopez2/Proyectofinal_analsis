@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Ayuda - Derivadas{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h1 class="h3 mb-0">
+                    <i class="bi bi-book"></i> Tutorial de Derivadas
+                </h1>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle-fill"></i>
+                    Este tutorial te enseñará cómo derivar funciones paso a paso.
+                </div>
+
+                <h2 class="h4 mb-3">¿Qué es una derivada?</h2>
+                <p>La derivada es una operación matemática que nos dice qué tan rápido cambia una función en cada punto. Es como la velocidad de cambio de la función.</p>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="h5">Reglas Básicas para Derivar</h3>
+                        
+                        <h4 class="h6 mt-3">1. Derivada de una constante</h4>
+                        <p>Si tienes un número solo (sin x), su derivada es 0.</p>
+                        <p>Ejemplo: La derivada de 5 es 0</p>
+
+                        <h4 class="h6 mt-3">2. Derivada de x</h4>
+                        <p>La derivada de x es 1.</p>
+                        <p>Ejemplo: La derivada de x es 1</p>
+
+                        <h4 class="h6 mt-3">3. Derivada de x^n</h4>
+                        <p>Para derivar x elevado a un número:</p>
+                        <ul>
+                            <li>Baja el exponente como número que multiplica</li>
+                            <li>Resta 1 al exponente</li>
+                        </ul>
+                        <p>Ejemplos:</p>
+                        <ul>
+                            <li>La derivada de x² es 2x</li>
+                            <li>La derivada de x³ es 3x²</li>
+                            <li>La derivada de x⁴ es 4x³</li>
+                        </ul>
+
+                        <h4 class="h6 mt-3">4. Derivada de una suma</h4>
+                        <p>Para derivar una suma, deriva cada término por separado.</p>
+                        <p>Ejemplo: La derivada de x² + 3x + 2 es 2x + 3</p>
+                    </div>
+                </div>
+
+                <h2 class="h4 mb-3">Cómo Derivar en el Sistema</h2>
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="h5">Paso 1: Ingresa tu función</h3>
+                        <p>En el campo de entrada, escribe tu función usando la siguiente notación:</p>
+                        <ul>
+                            <li>Para x², escribe: x^2</li>
+                            <li>Para x³, escribe: x^3</li>
+                            <li>Para multiplicación, usa * (ejemplo: 2*x)</li>
+                            <li>Para sumas y restas, usa + y -</li>
+                        </ul>
+
+                        <h3 class="h5 mt-4">Paso 2: Selecciona el método</h3>
+                        <p>El sistema te mostrará la derivada de tu función y una gráfica que muestra:</p>
+                        <ul>
+                            <li>La función original (en azul)</li>
+                            <li>La función derivada (en rojo)</li>
+                        </ul>
+
+                        <h3 class="h5 mt-4">Paso 3: Interpreta los resultados</h3>
+                        <p>El sistema te mostrará:</p>
+                        <ul>
+                            <li>La expresión de la derivada</li>
+                            <li>Una gráfica que te ayuda a visualizar cómo cambia la función</li>
+                            <li>Puntos importantes como máximos, mínimos y puntos de inflexión</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="alert alert-success mt-4">
+                    <i class="bi bi-lightbulb-fill"></i>
+                    <strong>Consejo:</strong> Recuerda que para derivar un polinomio:
+                    <ul class="mb-0 mt-2">
+                        <li>Multiplica cada término por su exponente</li>
+                        <li>Resta 1 al exponente</li>
+                        <li>Los términos constantes desaparecen</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

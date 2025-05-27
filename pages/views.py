@@ -8,6 +8,20 @@ import sympy as sp
 import matplotlib.pyplot as plt
 import io
 import urllib, base64
+from scipy.interpolate import lagrange, interp1d
+from django.http import JsonResponse
+from numpy.linalg import solve
+from django.views.decorators.csrf import csrf_exempt
+import json
+from metodos.capitulo3.newtonint import newtonint
+from metodos.capitulo3.newtonor import newtonor
+from metodos.capitulo3.lagrange import lagrange
+from metodos.capitulo3.spline_lineal import interpolacion_spline_lineal
+from metodos.capitulo3.spline_cubico import interpolacion_spline_cubico
+from metodos.capitulo3.vandermonde import interpolacion_vandermonde
+from metodos.capitulo1.biseccion import Biseccion
+from metodos.capitulo1.comparacion import ComparadorMetodos
+from metodos.comparacion_general import ComparadorGeneral
 
 #-------------Para ingresar todos los parametros de los metodos--------------------------
 class FunctionForm(forms.Form):
@@ -63,13 +77,14 @@ class NosotrosPageView(TemplateView):
 #-------------------------------------METODOS DESDE AQUI-------------------------------------------------------------------------
 #----------BISECCION----------------------
 class BiseccionForm(forms.Form):
-    xi = forms.FloatField(label='Xi', required=True)
-    xs = forms.FloatField(label='Xs', required=True)
-    tol = forms.FloatField(label='Tol', required=True)
-    niter = forms.IntegerField(label='Niter', required=True)
-    fun = forms.CharField(label='Function', required=True, widget=forms.TextInput(attrs={'placeholder': 'Ingrese la función en términos de x'}))
+    a = forms.FloatField(label='Límite inferior (a)', required=True)
+    b = forms.FloatField(label='Límite superior (b)', required=True)
+    tol = forms.FloatField(label='Tolerancia', required=True)
+    niter = forms.IntegerField(label='Número máximo de iteraciones', required=True)
+    fun = forms.CharField(label='Función f(x)', required=True, 
+                         widget=forms.TextInput(attrs={'placeholder': 'Ingrese la función en términos de x'}))
     export = forms.BooleanField(label='Exportar resultados a TXT', required=False)
-    
+
 class BiseccionPageView(TemplateView):
     template_name = 'biseccion.html'
 
@@ -81,102 +96,59 @@ class BiseccionPageView(TemplateView):
     def post(self, request, *args, **kwargs):
         form = BiseccionForm(request.POST)
         context = self.get_context_data()
+        
         if form.is_valid():
-            xi = form.cleaned_data['xi']
-            xs = form.cleaned_data['xs']
-            tol = form.cleaned_data['tol']
-            niter = form.cleaned_data['niter']
-            fun = form.cleaned_data['fun']
-            export = form.cleaned_data['export']
+            try:
+                a = form.cleaned_data['a']
+                b = form.cleaned_data['b']
+                tol = form.cleaned_data['tol']
+                niter = form.cleaned_data['niter']
+                fun = form.cleaned_data['fun']
+                export = form.cleaned_data['export']
 
-            x = sp.symbols('x')
-            fi = sp.sympify(fun).subs(x, xi)
-            fs = sp.sympify(fun).subs(x, xs)
-            iterations = []
-            
-            function_expr = sp.sympify(fun)
-            x_values = np.linspace(xi, xs, 400)
-            y_values = [function_expr.subs(x, val) for val in x_values]
+                # Crear instancia del método de bisección
+                biseccion = Biseccion()
+                
+                # Resolver el problema
+                iterations, table, graph, report = biseccion.solve(a, b, tol, niter, fun)
+                
+                # Generar comparación automática
+                comparador = ComparadorMetodos()
+                params = {
+                    'a': a,
+                    'b': b,
+                    'tol': tol,
+                    'niter': niter,
+                    'fun': fun,
+                    'x0': (a + b) / 2,  # Valor inicial para métodos que lo requieren
+                    'x1': b,  # Para el método de la secante
+                    'g': fun,  # Para punto fijo
+                    'deriv1': str(sp.diff(sp.sympify(fun), 'x')),  # Para Newton y Raíces Múltiples
+                    'deriv2': str(sp.diff(sp.diff(sp.sympify(fun), 'x'), 'x'))  # Para Raíces Múltiples
+                }
+                comparacion = comparador.comparar_metodos(params)
+                
+                # Exportar resultados si se solicita
+                if export:
+                    response = HttpResponse(content_type='text/plain')
+                    response['Content-Disposition'] = 'attachment; filename="resultados_biseccion.txt"'
+                    response.write("Iteración\tXi\tF(Xi)\tError\n")
+                    for row in iterations:
+                        response.write("\t".join(map(str, row)) + "\n")
+                    return response
 
-            fig, ax = plt.subplots(figsize=(10, 6))  # Aumenta el tamaño de la figura
-            ax.plot(x_values, y_values, label=f'f(x) = {fun}', color='blue')
-            ax.axhline(0, color='black', linewidth=0.5)
-            ax.axvline(0, color='black', linewidth=0.5)
-            ax.grid(color='gray', linestyle='--', linewidth=0.5)
-            ax.set_xlabel('x')  # Etiqueta del eje x
-            ax.set_ylabel('f(x)')  # Etiqueta del eje y
-            ax.set_title('Gráfica de la función')  # Título de la gráfica
-            plt.legend()
-
-            if fi == 0:
-                s = xi
-                E = 0
-                result = f"{xi} es raíz de f(x)"
-            elif fs == 0:
-                s = xs
-                E = 0
-                result = f"{xs} es raíz de f(x)"
-            elif fs * fi < 0:
-                c = 0
-                Xm = (xi + xs) / 2
-                fe = sp.sympify(fun).subs(x, Xm)
-                fm = [fe]
-                E = [100]
-
-                while E[c] > tol and fe != 0 and c < niter:
-                    row = [c + 1, xi, xs, Xm, fe, E[c]]
-                    iterations.append(row)
-
-                    if fi * fe < 0:
-                        xs = Xm
-                        fs = sp.sympify(fun).subs(x, xs)
-                    else:
-                        xi = Xm
-                        fi = sp.sympify(fun).subs(x, xi)
-
-                    Xa = Xm
-                    Xm = (xi + xs) / 2
-                    fe = sp.sympify(fun).subs(x, Xm)
-                    fm.append(fe)
-                    Error = abs(Xm - Xa)
-                    E.append(Error)
-                    c += 1
-
-                row = [c + 1, xi, xs, Xm, fe, Error]
-                iterations.append(row)
-
-                if fe == 0:
-                    s = Xm
-                    result = f"{Xm} es raíz de f(x)"
-                elif Error < tol:
-                    s = Xm
-                    result = f"{Xm} es una aproximación de una raíz de f(x) con una tolerancia {tol}"
-                else:
-                    result = f"Fracaso en {niter} iteraciones"
-            else:
-                result = "El intervalo es inadecuado"
-
-            if export:
-                response = HttpResponse(content_type='text/plain')
-                response['Content-Disposition'] = 'attachment; filename="resultados_biseccion.txt"'
-                response.write(f"Resultado: {result}\n")
-                response.write("Iteración\tXi\tXs\tXm\tf(Xm)\tError\n")
-                for row in iterations:
-                    response.write("\t".join(map(str, row)) + "\n")
-                return response
-
-            # Guardar la figura en un buffer
-            buf = io.BytesIO()
-            plt.savefig(buf, format='png')
-            buf.seek(0)
-            string = base64.b64encode(buf.read())
-            uri = 'data:image/png;base64,' + urllib.parse.quote(string)
-
-            context['result'] = result
-            context['iterations'] = iterations
-            context['form'] = form
-            context['image'] = uri
-
+                context['table'] = table
+                context['graph'] = graph
+                context['report'] = report
+                context['comparacion'] = comparacion
+                context['form'] = form
+                
+            except ValueError as e:
+                context['error'] = str(e)
+                context['form'] = form
+            except Exception as e:
+                context['error'] = f"Error inesperado: {str(e)}"
+                context['form'] = form
         else:
             context['form'] = form
 
@@ -203,75 +175,67 @@ class PuntoFijoPageView(TemplateView):
     def post(self, request, *args, **kwargs):
         form = PuntoFijoForm(request.POST)
         context = self.get_context_data()
+        
         if form.is_valid():
-            x0 = form.cleaned_data['x0']
-            tol = form.cleaned_data['tol']
-            niter = form.cleaned_data['niter']
-            f_str = form.cleaned_data['fun']
-            g_str = form.cleaned_data['g']
-            export = form.cleaned_data['export']
+            try:
+                x0 = form.cleaned_data['x0']
+                tol = form.cleaned_data['tol']
+                niter = form.cleaned_data['niter']
+                fun = form.cleaned_data['fun']
+                g = form.cleaned_data['g']
+                export = form.cleaned_data['export']
 
-            x = sp.symbols('x')
-            f = sp.sympify(f_str)
-            g = sp.sympify(g_str)
-
-            def punto_fijo(f, g, x0, tol, niter):
-                iteraciones = []
-                i = 0
-                error = tol + 1
-                iteraciones.append([i, x0, f.subs(x, x0), error])
-                while i < niter and error > tol:
-                    xn = g.subs(x, x0)
-                    i += 1
-                    error = abs(xn - x0)
-                    iteraciones.append([i, xn, f.subs(x, xn), error])
-                    x0 = xn
-                return iteraciones
-
-            iteraciones = punto_fijo(f, g, x0, tol, niter)
-            result = iteraciones[-1][1] if iteraciones else []
-
-            if export:
-                response = HttpResponse(content_type='text/plain')
-                response['Content-Disposition'] = 'attachment; filename="resultados_puntofijo.txt"'
-                response.write("Iteración\tX0\tF(X0)\tTolerancia\n")
-                for row in iteraciones:
-                    response.write(f"{row[0]}\t{row[1]}\t{row[2]}\t{row[3]}\n")
-                return response
-
-            # Graficar la función y las iteraciones
-            x_vals = np.linspace(x0 - 2, x0 + 2, 400)
-            y_vals = [float(f.subs(x, val)) for val in x_vals]
-
-            iter_x = [row[1] for row in iteraciones]
-            iter_y = [float(f.subs(x, val)) for val in iter_x]
-
-            fig, ax = plt.subplots(figsize=(10, 6))
-            ax.plot(x_vals, y_vals, label=f'f(x) = {f_str}', color='blue')
-            ax.plot(iter_x, iter_y, 'ro-', label='Iteraciones')
-            ax.axhline(0, color='black', linewidth=0.5)
-            ax.axvline(0, color='black', linewidth=0.5)
-            ax.grid(color='gray', linestyle='--', linewidth=0.5)
-            ax.set_xlabel('x')
-            ax.set_ylabel('f(x)')
-            ax.set_title('Gráfica de la función y el proceso de Punto Fijo')
-            plt.legend()
-
-            # Guardar la figura en un buffer
-            buf = io.BytesIO()
-            plt.savefig(buf, format='png')
-            buf.seek(0)
-            string = base64.b64encode(buf.read())
-            uri = 'data:image/png;base64,' + urllib.parse.quote(string)
-
-            context['result'] = result
-            context['iterations'] = iteraciones
-            context['form'] = form
-            context['image'] = uri
-
-        else:
-            context['form'] = form
-
+                # Crear instancia del método de punto fijo
+                puntofijo = PuntoFijo()
+                
+                # Resolver el problema
+                iterations, table, graph, report = puntofijo.solve(x0, tol, niter, fun, g)
+                
+                # Generar comparación automática
+                comparador = ComparadorMetodos()
+                params = {
+                    'x0': x0,
+                    'tol': tol,
+                    'niter': niter,
+                    'fun': fun,
+                    'g': g,
+                    'a': x0 - 1,  # Para métodos que requieren intervalo
+                    'b': x0 + 1,  # Para métodos que requieren intervalo
+                    'x1': x0 + 0.1,  # Para el método de la secante
+                    'deriv1': str(sp.diff(sp.sympify(fun), 'x')),  # Para Newton y Raíces Múltiples
+                    'deriv2': str(sp.diff(sp.diff(sp.sympify(fun), 'x'), 'x'))  # Para Raíces Múltiples
+                }
+                comparacion = comparador.comparar_metodos(params)
+                
+                # Agregar resultados al contexto
+                context['iterations'] = iterations
+                context['table'] = table
+                context['graph'] = graph
+                context['report'] = report
+                context['comparacion'] = comparacion
+                context['form'] = form
+                
+                if export:
+                    # Generar archivo de exportación
+                    response = HttpResponse(content_type='text/plain')
+                    response['Content-Disposition'] = f'attachment; filename="puntofijo_resultados.txt"'
+                    response.write(f"Método de Punto Fijo\n")
+                    response.write(f"==================\n\n")
+                    response.write(f"Función: {fun}\n")
+                    response.write(f"Función de iteración: {g}\n")
+                    response.write(f"Valor inicial: {x0}\n")
+                    response.write(f"Tolerancia: {tol}\n")
+                    response.write(f"Número máximo de iteraciones: {niter}\n\n")
+                    response.write(f"Resultados:\n")
+                    response.write(f"----------\n")
+                    response.write(f"Raíz aproximada: {iterations[-1][1]}\n")
+                    response.write(f"Error final: {iterations[-1][3]}\n")
+                    response.write(f"Número de iteraciones: {len(iterations)}\n")
+                    return response
+                
+            except Exception as e:
+                context['error'] = str(e)
+        
         return render(request, self.template_name, context)
 
 #---------Regla_Falsa-------------------
@@ -1066,42 +1030,42 @@ class VandermondePageView(TemplateView):
         context = self.get_context_data()
         if form.is_valid():
             try:
-                x_vals = list(map(float, form.cleaned_data['x_vals'].split(',')))
-                y_vals = list(map(float, form.cleaned_data['y_vals'].split(',')))
+                x_values = list(map(float, form.cleaned_data['x_vals'].split(',')))
+                y_values = list(map(float, form.cleaned_data['y_vals'].split(',')))
                 export = form.cleaned_data['export']
             except ValueError:
                 context['error'] = "Asegúrate de que los valores de x e y están bien formateados y separados por comas."
                 context['form'] = form
                 return render(request, self.template_name, context)
 
-            if len(x_vals) != len(y_vals):
+            if len(x_values) != len(y_values):
                 context['error'] = "El número de valores de x y y deben ser iguales."
                 context['form'] = form
                 return render(request, self.template_name, context)
 
-            n = len(x_vals)
-            A = np.vander(x_vals, increasing=True)
-            coeffs = np.linalg.solve(A, y_vals)
+            n = len(x_values)
+            A = np.vander(x_values, increasing=True)
+            coef = np.linalg.solve(A, y_values)
 
             # Crear la función de interpolación
             x = sp.symbols('x')
-            poly = sum(sp.Rational(c) * x**i for i, c in enumerate(coeffs))
+            poly = sum(sp.Rational(c) * x**i for i, c in enumerate(coef))
 
             if export:
                 response = HttpResponse(content_type='text/plain')
                 response['Content-Disposition'] = 'attachment; filename="resultados_vandermonde.txt"'
                 response.write("Coeficientes del polinomio de interpolación:\n")
-                response.write(f"{coeffs}\n")
+                response.write(f"{coef}\n")
                 return response
 
             # Graficar los puntos y el polinomio de interpolación
-            x_plot = np.linspace(min(x_vals) - 1, max(x_vals) + 1, 400)
+            x_plot = np.linspace(min(x_values) - 1, max(x_values) + 1, 400)
             y_plot = [poly.subs(x, val) for val in x_plot]
             y_plot = np.array(y_plot, dtype=float)
 
             fig, ax = plt.subplots(figsize=(10, 6))
             ax.plot(x_plot, y_plot, label=f'Polinomio de interpolación', color='blue')
-            ax.plot(x_vals, y_vals, 'ro', label='Puntos de interpolación')  # Graficar solo puntos
+            ax.plot(x_values, y_values, 'ro', label='Puntos de interpolación')  # Graficar solo puntos
             ax.axhline(0, color='black', linewidth=0.5)
             ax.axvline(0, color='black', linewidth=0.5)
             ax.grid(color='gray', linestyle='--', linewidth=0.5)
@@ -1117,7 +1081,7 @@ class VandermondePageView(TemplateView):
             string = base64.b64encode(buf.read())
             uri = 'data:image/png;base64,' + urllib.parse.quote(string)
 
-            context['coeffs'] = coeffs
+            context['coeffs'] = coef
             context['form'] = form
             context['image'] = uri
         else:
@@ -1392,3 +1356,237 @@ class SplineLinealPageView(TemplateView):
         response = HttpResponse(content, content_type='text/plain')
         response['Content-Disposition'] = 'attachment; filename="resultados.txt"'
         return response
+
+class SplineCubicoForm(forms.Form):
+    x_values = forms.CharField(label='Valores de X (separados por comas)', required=True, 
+                             widget=forms.TextInput(attrs={'placeholder': 'Ejemplo: 1,2,3,4,5'}))
+    y_values = forms.CharField(label='Valores de Y (separados por comas)', required=True,
+                             widget=forms.TextInput(attrs={'placeholder': 'Ejemplo: 2,4,6,8,10'}))
+    export = forms.BooleanField(label='Exportar resultados a TXT', required=False)
+
+class SplineCubicoPageView(TemplateView):
+    template_name = 'spline_cubico.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = SplineCubicoForm()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = SplineCubicoForm(request.POST)
+        context = self.get_context_data()
+        
+        if form.is_valid():
+            try:
+                x_values = [float(x.strip()) for x in form.cleaned_data['x_values'].split(',')]
+                y_values = [float(y.strip()) for y in form.cleaned_data['y_values'].split(',')]
+                
+                if len(x_values) != len(y_values):
+                    context['error'] = 'Los vectores X e Y deben tener la misma longitud'
+                    context['form'] = form
+                    return render(request, self.template_name, context)
+                
+                if len(x_values) < 4:
+                    context['error'] = 'Se requieren al menos 4 puntos para el Spline Cúbico'
+                    context['form'] = form
+                    return render(request, self.template_name, context)
+
+                funcion, expr, image = interpolacion_spline_cubico(x_values, y_values)
+                
+                context['funcion'] = funcion
+                context['expr'] = expr
+                context['image'] = image
+                context['form'] = form
+
+            except ValueError as e:
+                context['error'] = str(e)
+                context['form'] = form
+            except Exception as e:
+                context['error'] = f'Error al procesar los datos: {str(e)}'
+                context['form'] = form
+        else:
+            context['form'] = form
+
+        return render(request, self.template_name, context)
+
+def home(request):
+    return render(request, 'home.html')
+
+def metodos(request):
+    return render(request, 'metodos.html')
+
+def nosotros(request):
+    return render(request, 'nosotros.html')
+
+def ayuda_derivadas(request):
+    return render(request, 'ayuda/derivadas.html')
+
+@csrf_exempt
+def interpolacion(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            x_values = [float(x) for x in data['x_values'].split(',')]
+            y_values = [float(y) for y in data['y_values'].split(',')]
+            metodo = data['metodo']
+            
+            # Convertir a arrays de numpy
+            x = np.array(x_values)
+            y = np.array(y_values)
+            
+            if metodo == 'vandermonde':
+                polinomio, error, graph = interpolacion_vandermonde(x_values, y_values)
+                
+            elif metodo == 'newton':
+                polinomio, error, graph = newtonint(x_values, y_values)
+                
+            elif metodo == 'lagrange':
+                polinomio, error, graph = lagrange(x_values, y_values)
+                
+            elif metodo == 'spline_lineal':
+                polinomio, error, graph = interpolacion_spline_lineal(x_values, y_values)
+                
+            elif metodo == 'spline_cubico':
+                polinomio, error, graph = interpolacion_spline_cubico(x_values, y_values)
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Método no válido'
+                })
+            
+            return JsonResponse({
+                'success': True,
+                'polinomio': polinomio,
+                'error': error,
+                'graph': graph
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+    
+    return JsonResponse({
+        'success': False,
+        'error': 'Método no permitido'
+    })
+
+def vandermonde(request):
+    if request.method == 'POST':
+        try:
+            # Obtener datos del formulario
+            x_values = [float(x) for x in request.POST.get('x_values', '').split(',')]
+            y_values = [float(y) for y in request.POST.get('y_values', '').split(',')]
+            
+            polinomio, error, graph = interpolacion_vandermonde(x_values, y_values)
+            
+            return JsonResponse({
+                'success': True,
+                'graph': graph,
+                'polinomio': polinomio,
+                'error': error
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+    
+    return render(request, 'vandermonde.html')
+
+class ComparacionGeneralPageView(TemplateView):
+    template_name = 'comparacion_general.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        # Recopilar resultados de todos los métodos
+        resultados = {}
+        
+        # Capítulo 1: Métodos de Búsqueda de Raíces
+        for nombre, metodo in ComparadorGeneral().metodos_cap1.items():
+            try:
+                # Usar parámetros por defecto para la comparación
+                iterations, table, graph, report = metodo.solve(
+                    a=-1, b=1, tol=1e-6, niter=100,
+                    fun="x^2 - 4"  # Función de ejemplo
+                )
+                resultados[nombre] = {
+                    'capitulo': 'cap1',
+                    'iteraciones': len(iterations),
+                    'error': iterations[-1][3] if iterations else float('inf'),
+                    'converge': True
+                }
+            except Exception as e:
+                resultados[nombre] = {
+                    'capitulo': 'cap1',
+                    'iteraciones': 0,
+                    'error': float('inf'),
+                    'converge': False,
+                    'error_msg': str(e)
+                }
+        
+        # Capítulo 2: Métodos de Sistemas Lineales
+        for nombre, metodo in ComparadorGeneral().metodos_cap2.items():
+            try:
+                # Usar matriz de ejemplo 3x3
+                A = np.array([[4, -1, 0], [-1, 4, -1], [0, -1, 4]])
+                b = np.array([1, 1, 1])
+                x0 = np.zeros(3)
+                iterations, result = metodo.solve(A, b, x0, 3, 1e-6, 100)
+                resultados[nombre] = {
+                    'capitulo': 'cap2',
+                    'iteraciones': len(iterations),
+                    'error': iterations[-1][2] if iterations else float('inf'),
+                    'converge': True
+                }
+            except Exception as e:
+                resultados[nombre] = {
+                    'capitulo': 'cap2',
+                    'iteraciones': 0,
+                    'error': float('inf'),
+                    'converge': False,
+                    'error_msg': str(e)
+                }
+        
+        # Capítulo 3: Métodos de Interpolación
+        x_values = [0, 1, 2, 3, 4]
+        y_values = [0, 1, 4, 9, 16]
+        for nombre, metodo in ComparadorGeneral().metodos_cap3.items():
+            try:
+                if nombre in ['Vandermonde', 'Newton Interpolante', 'Lagrange']:
+                    polinomio, error, graph = metodo(x_values, y_values)
+                    resultados[nombre] = {
+                        'capitulo': 'cap3',
+                        'iteraciones': 1,  # Los métodos de interpolación no son iterativos
+                        'error': error,
+                        'converge': True
+                    }
+                else:  # Spline Lineal y Cúbico
+                    coef, polinomios = metodo(x_values, y_values, len(x_values))
+                    resultados[nombre] = {
+                        'capitulo': 'cap3',
+                        'iteraciones': 1,
+                        'error': 0,  # Los splines pasan exactamente por los puntos
+                        'converge': True
+                    }
+            except Exception as e:
+                resultados[nombre] = {
+                    'capitulo': 'cap3',
+                    'iteraciones': 0,
+                    'error': float('inf'),
+                    'converge': False,
+                    'error_msg': str(e)
+                }
+        
+        # Generar informe de comparación
+        comparador = ComparadorGeneral()
+        informe = comparador.comparar_todos(resultados)
+        
+        context = self.get_context_data()
+        context['informe'] = informe
+        return render(request, self.template_name, context)

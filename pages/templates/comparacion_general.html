@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Comparación General de Métodos - Análisis Numérico{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h4 mb-0">
+                        <i class="bi bi-bar-chart"></i> Comparación General de Métodos Numéricos
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h4 class="alert-heading">Información</h4>
+                        <p>Esta página muestra una comparación general de todos los métodos numéricos implementados, evaluados con problemas de ejemplo.</p>
+                        <hr>
+                        <p class="mb-0">Los métodos se comparan en términos de:</p>
+                        <ul>
+                            <li>Número de iteraciones</li>
+                            <li>Error final</li>
+                            <li>Convergencia</li>
+                        </ul>
+                    </div>
+
+                    <form method="post" class="mb-4">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-arrow-repeat"></i> Generar Comparación
+                        </button>
+                    </form>
+
+                    {% if informe %}
+                    <div class="comparacion-resultados">
+                        {{ informe|safe }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .comparacion-general {
+        margin-top: 2rem;
+    }
+    .capitulo {
+        margin-bottom: 2rem;
+        padding: 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+    }
+    .capitulo h3 {
+        color: #0d6efd;
+        margin-bottom: 1rem;
+    }
+    .analisis-general {
+        margin-top: 2rem;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 0.25rem;
+    }
+    .table {
+        margin-top: 1rem;
+    }
+    .table th {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %} 

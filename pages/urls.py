@@ -1,6 +1,13 @@
 from django.urls import path
-from .views import HomePageView, MetodosPageView, NosotrosPageView, BiseccionPageView, PuntoFijoPageView, ReglaFalsaPageView, NewtonPageView, SecantePageView, RaicesMultiplesPageView, GaussSeidelPageView, JacobiPageView, SORPageView, SORMatricialPageView, VandermondePageView, NewtonInterpolantePageView, LagrangePageView, SplineLinealPageView
-
+from .views import (
+    HomePageView, MetodosPageView, NosotrosPageView,
+    BiseccionPageView, PuntoFijoPageView, ReglaFalsaPageView,
+    NewtonPageView, SecantePageView, RaicesMultiplesPageView,
+    GaussSeidelPageView, JacobiPageView, SORPageView, SORMatricialPageView,
+    VandermondePageView, NewtonInterpolantePageView, LagrangePageView,
+    SplineLinealPageView, SplineCubicoPageView, ComparacionGeneralPageView,
+    ayuda_derivadas
+)
 
 urlpatterns = [
     path('', HomePageView.as_view(), name='home'),
@@ -17,8 +24,10 @@ urlpatterns = [
     path('sor/', SORPageView.as_view(), name='sor'),
     path('sor_matricial/', SORMatricialPageView.as_view(), name='sor_matricial'),
     path('vandermonde/', VandermondePageView.as_view(), name='vandermonde'),
-    path('vandermonde/', VandermondePageView.as_view(), name='vandermonde'),
     path('newton_interpolante/', NewtonInterpolantePageView.as_view(), name='newton_interpolante'),
     path('lagrange/', LagrangePageView.as_view(), name='lagrange'),
-    path('spline/', SplineLinealPageView.as_view(), name='spline'),
+    path('spline/', SplineLinealPageView.as_view(), name='spline_lineal'),
+    path('spline_cubico/', SplineCubicoPageView.as_view(), name='spline_cubico'),
+    path('comparacion_general/', ComparacionGeneralPageView.as_view(), name='comparacion_general'),
+    path('ayuda/derivadas/', ayuda_derivadas, name='ayuda_derivadas'),
 ]

@@ -1,64 +1,103 @@
 {% extends 'base.html' %}
-{% load static %}
-{% block title %}Método de Lagrange{% endblock %}
+
+{% block title %}Lagrange - Métodos Numéricos{% endblock %}
 
 {% block content %}
-<h1>Método de Lagrange</h1>
-<p>El polinomio de Lagrange tiene la siguiente forma:</p>
-<img src="{% static 'images/lagrange.png' %}" alt="lagrange">
-<form method="post" id="lagrangeForm">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="button" class="btn" onclick="generateInputs()">Generar Entradas</button>
-    <div id="inputContainer">
-        <div id="xsInputs"></div>
-        <div id="yInputs"></div>
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h1 class="h3 mb-0">
+                    <i class="bi bi-graph-up"></i> Método de Lagrange
+                </h1>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle-fill"></i>
+                    El método de Lagrange construye el polinomio interpolante usando polinomios de Lagrange, que son polinomios de grado n que valen 1 en un punto y 0 en los demás.
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-light">
+                                <h2 class="h5 mb-0">Datos de Entrada</h2>
+                            </div>
+                            <div class="card-body">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label for="x_values" class="form-label">Valores de X (separados por comas)</label>
+                                        <input type="text" class="form-control" id="x_values" name="x_values" 
+                                               placeholder="Ejemplo: 1,2,3,4,5" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="y_values" class="form-label">Valores de Y (separados por comas)</label>
+                                        <input type="text" class="form-control" id="y_values" name="y_values" 
+                                               placeholder="Ejemplo: 2,4,6,8,10" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="bi bi-calculator"></i> Calcular
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-light">
+                                <h2 class="h5 mb-0">Descripción del Método</h2>
+                            </div>
+                            <div class="card-body">
+                                <p>El método de Lagrange:</p>
+                                <ul>
+                                    <li>Utiliza polinomios de Lagrange como base</li>
+                                    <li>Es más estable numéricamente que Vandermonde</li>
+                                    <li>Es útil para análisis teórico</li>
+                                    <li>Permite una fácil evaluación del polinomio</li>
+                                </ul>
+                                <div class="alert alert-warning">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                    Nota: El método puede ser computacionalmente costoso para conjuntos de datos grandes.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if funcion %}
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h2 class="h4 mb-0">Resultados</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <h3 class="h5">Polinomio Interpolante</h3>
+                                    <div class="alert alert-info">{{ funcion }}</div>
+                                </div>
+                                {% if expr %}
+                                <div class="mb-4">
+                                    <h3 class="h5">Expresión</h3>
+                                    <div class="alert alert-info">{{ expr }}</div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {% if image %}
+                                <h3 class="h5">Gráfica</h3>
+                                <div class="text-center">
+                                    <img src="{{ image }}" class="img-fluid rounded" alt="Gráfica de la interpolación de Lagrange">
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
     </div>
-    <button type="submit" class="btn">Calcular</button>
-</form>
-
-{% if expr %}
-    <h2>Resultado:</h2>
-    <p>{{ expr }}</p>
-{% endif %}
-
-{% if image %}
-    <h2>Gráfica de la interpolación de Lagrange:</h2>
-    <img src="{{ image }}" alt="Gráfica de la interpolación de Lagrange">
-{% endif %}
-
-<script>
-function generateInputs() {
-    const n = document.getElementById('id_n').value;
-    let xsInputs = '<h3>Valores de X</h3>';
-    let yInputs = '<h3>Valores de Y</h3>';
-
-    for (let i = 0; i < n; i++) {
-        xsInputs += `<input type="text" name="xs_${i}" placeholder="X[${i}]" required><br>`;
-        yInputs += `<input type="text" name="y_${i}" placeholder="Y[${i}]" required><br>`;
-    }
-
-    document.getElementById('xsInputs').innerHTML = xsInputs;
-    document.getElementById('yInputs').innerHTML = yInputs;
-}
-</script>
-
-<style>
-#inputContainer {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 20px;
-}
-
-#xsInputs, #yInputs {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-input[type="text"] {
-    margin: 2px;
-    padding: 5px;
-}
-</style>
+</div>
 {% endblock %}

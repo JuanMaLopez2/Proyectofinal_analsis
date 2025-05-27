@@ -1,23 +1,60 @@
 {% extends 'base.html' %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Inicio - Métodos Numéricos{% endblock %}
 
 {% block content %}
-<h1>Sitio web donde encontrarás varios métodos utilizados en análisis numérico</h1>
-<p>En métodos encontrarás los diferentes métodos que puedes usar.</p>
-<button class="btn"><a href="{% url 'metodos' %}">Metodos</a></button>
-
-<h2>Gráfica Interactiva</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Generar Gráfica</button>
-</form>
-
-<div>
-    {% if plot_div %}
-        {{ plot_div|safe }}
-        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    {% endif %}
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center mb-5">
+        <h1 class="display-4 mb-4">Métodos Numéricos</h1>
+        <p class="lead">Explora y utiliza diferentes métodos numéricos para resolver problemas matemáticos de manera eficiente.</p>
+        <a href="{% url 'metodos' %}" class="btn btn-primary btn-lg">
+            <i class="bi bi-list-check"></i> Ver Métodos
+        </a>
+    </div>
 </div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title h4 mb-4">
+                    <i class="bi bi-graph-up"></i> Gráfica Interactiva
+                </h2>
+                <form method="post" class="mb-4">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="{{ form.function.id_for_label }}" class="form-label">Función</label>
+                        {{ form.function }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-play-fill"></i> Generar Gráfica
+                    </button>
+                </form>
+
+                {% if plot_div %}
+                <div class="mt-4">
+                    {{ plot_div|safe }}
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control {
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        border: 1px solid #dee2e6;
+    }
+    .form-control:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+    .btn-lg {
+        padding: 1rem 2rem;
+        border-radius: 0.5rem;
+    }
+</style>
 {% endblock %}

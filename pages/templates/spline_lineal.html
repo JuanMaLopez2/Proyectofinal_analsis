@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Spline Lineal - Métodos Numéricos{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h1 class="h3 mb-0">
+                    <i class="bi bi-graph-up"></i> Método de Spline Lineal
+                </h1>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle-fill"></i>
+                    El método de Spline Lineal interpola los puntos usando segmentos de línea recta entre cada par de puntos consecutivos.
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-light">
+                                <h2 class="h5 mb-0">Datos de Entrada</h2>
+                            </div>
+                            <div class="card-body">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label for="x_values" class="form-label">Valores de X (separados por comas)</label>
+                                        <input type="text" class="form-control" id="x_values" name="x_values" 
+                                               placeholder="Ejemplo: 1,2,3,4,5" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="y_values" class="form-label">Valores de Y (separados por comas)</label>
+                                        <input type="text" class="form-control" id="y_values" name="y_values" 
+                                               placeholder="Ejemplo: 2,4,6,8,10" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="bi bi-calculator"></i> Calcular
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-light">
+                                <h2 class="h5 mb-0">Descripción del Método</h2>
+                            </div>
+                            <div class="card-body">
+                                <p>El método de Spline Lineal:</p>
+                                <ul>
+                                    <li>Conecta puntos adyacentes con líneas rectas</li>
+                                    <li>Es el método más simple de interpolación</li>
+                                    <li>Produce una función continua pero no suave</li>
+                                    <li>Es útil para visualización rápida de datos</li>
+                                </ul>
+                                <div class="alert alert-warning">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                    Nota: Los valores de X deben estar ordenados de menor a mayor para obtener resultados correctos.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if funcion %}
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h2 class="h4 mb-0">Resultados</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <h3 class="h5">Función Interpolante</h3>
+                                    <div class="alert alert-info">{{ funcion }}</div>
+                                </div>
+                                {% if expr %}
+                                <div class="mb-4">
+                                    <h3 class="h5">Expresión</h3>
+                                    <div class="alert alert-info">{{ expr }}</div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {% if image %}
+                                <h3 class="h5">Gráfica</h3>
+                                <div class="text-center">
+                                    <img src="{{ image }}" class="img-fluid rounded" alt="Gráfica de la interpolación Spline Lineal">
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

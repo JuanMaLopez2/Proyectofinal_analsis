@@ -1,49 +1,107 @@
 {% extends 'base.html' %}
+
 {% block title %}Método de Punto Fijo{% endblock %}
 
 {% block content %}
-<h1>Método de Punto Fijo</h1>
-<p>Este método permite hallar la solución aproximada a f(x)=0 a partir de un punto inicial x0 y una función g(x) que debe cumplir las siguientes condiciones para que g tenga un único punto fijo en [a,b]:</p>
-    <li>Es continua en el intervalo [a,b]</li>
-    <li>Para todo x[a,b], g(x) [a,b] y g'(x) [a,b] existe.</li>
-    <li>Para todo x[a,b],| g'(x)|k<1</li> 
-<p>La ecuación f(x)=0 se puede escribir como x = g(x), el método realiza la relación iterativa xn= g(xn-1) hasta que se cumpla la tolerancia.  </p>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn">Calcular</button>
-</form>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="text-center">Método de Punto Fijo</h2>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h4 class="alert-heading">Instrucciones</h4>
+                        <p>El método de punto fijo requiere:</p>
+                        <ul>
+                            <li>Una función f(x) cuya raíz se desea encontrar</li>
+                            <li>Una función de iteración g(x) que debe cumplir |g'(x)| < 1 en un entorno de la raíz</li>
+                            <li>Un valor inicial x0</li>
+                            <li>Una tolerancia para el error</li>
+                            <li>Un número máximo de iteraciones</li>
+                        </ul>
+                    </div>
 
-{% if error %}
-    <div class="error">{{ error }}</div>
-{% endif %}
+                    <form method="post" class="mb-4">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.x0.label_tag }}
+                                    {{ form.x0 }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.tol.label_tag }}
+                                    {{ form.tol }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.niter.label_tag }}
+                                    {{ form.niter }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.export.label_tag }}
+                                    {{ form.export }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.fun.label_tag }}
+                                    {{ form.fun }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form.g.label_tag }}
+                                    {{ form.g }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary">Calcular</button>
+                        </div>
+                    </form>
 
-{% if iterations %}
-    <h2>Tabla de Resultados:</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Iteración</th>
-                <th>X0</th>
-                <th>F(X0)</th>
-                <th>Error</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in iterations %}
-                <tr>
-                    {% for item in row %}
-                        <td>{{ item }}</td>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% endif %}
+                    {% if error %}
+                    <div class="alert alert-danger">
+                        {{ error }}
+                    </div>
+                    {% endif %}
 
-{% if image %}
-    <h2>Gráfica:</h2>
-    <img src="{{ image }}" alt="Gráfica de la función">
-{% endif %}
+                    {% if iterations %}
+                    <div class="results mt-4">
+                        <h3>Resultados</h3>
+                        {{ table|safe }}
+                        
+                        <div class="mt-4">
+                            <h4>Gráfica</h4>
+                            {{ graph|safe }}
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h4>Reporte</h4>
+                            {{ report|safe }}
+                        </div>
 
+                        <div class="mt-4">
+                            <h4>Comparación con otros métodos</h4>
+                            {{ comparacion|safe }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

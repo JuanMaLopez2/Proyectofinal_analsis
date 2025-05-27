@@ -1,37 +1,198 @@
 {% extends 'base.html' %}
 
-{% block title %}Métodos{% endblock %}
+{% block title %}Métodos - Análisis Numérico{% endblock %}
 
 {% block content %}
-<h1>Métodos</h1>
-<p> IMPORTANTE: Todas las funciones y derivadas se tienen que ingresar como entradas de python:</p>
-<li>Para exponentes se ulitiza ** por ejemplo: x**2</li>
-<li>Para multiplicar solo se utiliza uno por ejemplo: 2*x</li>
-<h2> Metodos del capitulo 1 </h2>
-<p>Seleccione un método:</p>
-<div class="buttons-container">
-    <a class="btn" href="{% url 'biseccion' %}">Método de Bisección</a>
-    <a class="btn" href="{% url 'puntofijo' %}">Método de Punto Fijo</a>
-    <a class="btn" href="{% url 'reglafalsa' %}">Método de la Regla Falsa</a>
-    <a class="btn" href="{% url 'newton' %}">Método de Newton</a>
-    <a class="btn" href="{% url 'secante' %}">Método de la Secante</a>
-    <a class="btn" href="{% url 'raicesmultiples' %}">Método de Raíces Múltiples</a>
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <h1 class="display-4 text-center mb-5">Métodos Numéricos</h1>
+        
+        <!-- Métodos de Búsqueda de Raíces -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h4 mb-0">
+                    <i class="bi bi-search"></i> Métodos de Búsqueda de Raíces
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h3 class="h5 card-title">Bisección</h3>
+                                <p class="card-text">Método para encontrar raíces de una función en un intervalo dado.</p>
+                                <a href="{% url 'biseccion' %}" class="btn btn-outline-primary">Usar Método</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h3 class="h5 card-title">Regla Falsa</h3>
+                                <p class="card-text">Método que utiliza interpolación lineal para encontrar raíces.</p>
+                                <a href="{% url 'reglafalsa' %}" class="btn btn-outline-primary">Usar Método</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h3 class="h5 card-title">Punto Fijo</h3>
+                                <p class="card-text">Método iterativo para encontrar puntos fijos de una función.</p>
+                                <a href="{% url 'puntofijo' %}" class="btn btn-outline-primary">Usar Método</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h3 class="h5 card-title">Newton</h3>
+                                <p class="card-text">Método que utiliza la derivada para converger más rápidamente.</p>
+                                <a href="{% url 'newton' %}" class="btn btn-outline-primary">Usar Método</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h3 class="h5 card-title">Secante</h3>
+                                <p class="card-text">Método que aproxima la derivada usando diferencias finitas.</p>
+                                <a href="{% url 'secante' %}" class="btn btn-outline-primary">Usar Método</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h3 class="h5 card-title">Raíces Múltiples</h3>
+                                <p class="card-text">Método para encontrar raíces múltiples de una función.</p>
+                                <a href="{% url 'raicesmultiples' %}" class="btn btn-outline-primary">Usar Método</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Métodos de Sistemas Lineales -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-success text-white">
+                <h2 class="h4 mb-0">
+                    <i class="bi bi-grid-3x3"></i> Métodos de Sistemas Lineales
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h3 class="h5 card-title">Jacobi</h3>
+                                <p class="card-text">Método iterativo para resolver sistemas de ecuaciones lineales.</p>
+                                <a href="{% url 'jacobi' %}" class="btn btn-outline-success">Usar Método</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h3 class="h5 card-title">Gauss-Seidel</h3>
+                                <p class="card-text">Método iterativo que mejora la convergencia del método de Jacobi.</p>
+                                <a href="{% url 'gaussseidel' %}" class="btn btn-outline-success">Usar Método</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h3 class="h5 card-title">SOR</h3>
+                                <p class="card-text">Método de Sobrerrelajación Sucesiva para sistemas lineales.</p>
+                                <a href="{% url 'sor' %}" class="btn btn-outline-success">Usar Método</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h3 class="h5 card-title">SOR Matricial</h3>
+                                <p class="card-text">Versión matricial del método SOR para sistemas lineales.</p>
+                                <a href="{% url 'sor_matricial' %}" class="btn btn-outline-success">Usar Método</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Métodos de Interpolación -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-info text-white">
+                <h2 class="h4 mb-0">
+                    <i class="bi bi-graph-up"></i> Métodos de Interpolación
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h3 class="h5 card-title">Vandermonde</h3>
+                                <p class="card-text">Método de interpolación polinomial usando matrices de Vandermonde.</p>
+                                <a href="{% url 'vandermonde' %}" class="btn btn-outline-info">Usar Método</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h3 class="h5 card-title">Newton Interpolante</h3>
+                                <p class="card-text">Método de interpolación usando diferencias divididas de Newton.</p>
+                                <a href="{% url 'newton_interpolante' %}" class="btn btn-outline-info">Usar Método</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h3 class="h5 card-title">Lagrange</h3>
+                                <p class="card-text">Método de interpolación usando polinomios de Lagrange.</p>
+                                <a href="{% url 'lagrange' %}" class="btn btn-outline-info">Usar Método</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h3 class="h5 card-title">Spline Lineal</h3>
+                                <p class="card-text">Método de interpolación usando splines lineales.</p>
+                                <a href="{% url 'spline_lineal' %}" class="btn btn-outline-info">Usar Método</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h3 class="h5 card-title">Spline Cúbico</h3>
+                                <p class="card-text">Método de interpolación usando splines cúbicos para curvas suaves.</p>
+                                <a href="{% url 'spline_cubico' %}" class="btn btn-outline-info">Usar Método</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 </div>
-<h2> Metodos del capitulo 2 </h2>
-<p>Seleccione un método:</p>
-<div class="buttons-container">
-    <a class="btn" href="{% url 'gaussseidel' %}">Método de Gauss-Seidel</a>
-    <a class="btn" href="{% url 'jacobi' %}">Método de Jacobi</a>
-    <a class="btn" href="{% url 'sor' %}">Método de SOR</a>
-    <a class="btn" href="{% url 'sor_matricial' %}">Método de SOR Matricial</a>
 </div>
-<h2> Metodos del capitulo 3 </h2>
-<p>IMPORTANTE: EN ESTOS MÉTODOS UN MISMO VALOR DE X NO PUEDE TENER VARIOS VALORES DE Y.<p>
-<p>Seleccione un método:</p>
-<div class="buttons-container">
-    <a class="btn" href="{% url 'vandermonde' %}">Método de vandermonde</a>
-    <a class="btn" href="{% url 'newton_interpolante' %}">Método de Newton Interpolante</a>
-    <a class="btn" href="{% url 'lagrange' %}">Método de Lagrange</a>
-    <a class="btn" href="{% url 'spline' %}">Método de Spline Lineal</a>
 </div>
+
+<style>
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .btn-outline-primary:hover, .btn-outline-success:hover, .btn-outline-info:hover {
+        transform: translateY(-2px);
+    }
+</style>
 {% endblock %}

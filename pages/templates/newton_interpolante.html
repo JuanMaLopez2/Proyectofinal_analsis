@@ -1,52 +1,139 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Método de Newton Interpolante{% endblock %}
+
+{% block title %}Newton Interpolante - Métodos Numéricos{% endblock %}
 
 {% block content %}
-<h1>Método de Newton Interpolante</h1>
-<p>El polinomio interpolador de Newton tiene la forma:</p>
-<img src="{% static 'images/newton.png' %}" alt="newton">
-<p>Ingrese los puntos (puede ser todos los x en un vector y todos los y en otro).</p>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="button" onclick="generateInputs()">Generar Matriz y Vector</button>
-    <div id="vectorInputs"></div>
-    <button type="submit" class="btn">Calcular</button>
-</form>
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h1 class="h3 mb-0">
+                    <i class="bi bi-graph-up"></i> Método de Newton Interpolante
+                </h1>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle-fill"></i>
+                    El método de Newton Interpolante utiliza diferencias divididas para encontrar el polinomio interpolante que pasa por todos los puntos dados.
+                </div>
 
-{% if error %}
-    <div class="error">{{ error }}</div>
-{% endif %}
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-light">
+                                <h2 class="h5 mb-0">Datos de Entrada</h2>
+                            </div>
+                            <div class="card-body">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label for="id_n" class="form-label">Número de puntos</label>
+                                        <input type="number" class="form-control" id="id_n" name="n" min="2" required>
+                                    </div>
+                                    <button type="button" class="btn btn-secondary mb-3" onclick="generateInputs()">
+                                        <i class="bi bi-plus-circle"></i> Generar Campos
+                                    </button>
+                                    <div id="vectorInputs"></div>
+                                    <button type="submit" class="btn btn-primary w-100 mt-3">
+                                        <i class="bi bi-calculator"></i> Calcular
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-light">
+                                <h2 class="h5 mb-0">Descripción del Método</h2>
+                            </div>
+                            <div class="card-body">
+                                <p>El método de Newton Interpolante:</p>
+                                <ul>
+                                    <li>Utiliza diferencias divididas para construir el polinomio</li>
+                                    <li>Es más eficiente que el método de Vandermonde</li>
+                                    <li>Permite agregar nuevos puntos sin recalcular todo</li>
+                                    <li>Es útil para conjuntos de datos grandes</li>
+                                </ul>
+                                <div class="alert alert-warning">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                    Nota: Los puntos x deben ser distintos entre sí.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-{% if funcion %}
-    <h2>Función Interpolante:</h2>
-    <p>{{ funcion }}</p>
-{% endif %}
+                {% if error %}
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    {{ error }}
+                </div>
+                {% endif %}
 
-{% if expr %}
-    <h2>Expresión:</h2>
-    <p>{{ expr }}</p>
-{% endif %}
-
-{% if image %}
-    <h2>Gráfica de la interpolación de Newton:</h2>
-    <img src="{{ image }}" alt="Gráfica de la interpolación de Newton">
-{% endif %}
+                {% if funcion %}
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h2 class="h4 mb-0">Resultados</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <h3 class="h5">Polinomio Interpolante</h3>
+                                    <div class="alert alert-info">{{ funcion }}</div>
+                                </div>
+                                {% if expr %}
+                                <div class="mb-4">
+                                    <h3 class="h5">Expresión</h3>
+                                    <div class="alert alert-info">{{ expr }}</div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {% if image %}
+                                <h3 class="h5">Gráfica</h3>
+                                <div class="text-center">
+                                    <img src="{{ image }}" class="img-fluid rounded" alt="Gráfica de la interpolación de Newton">
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
 function generateInputs() {
     const n = document.getElementById('id_n').value;
-
-    let vectorInputs = '<h3>Vector xs</h3>';
-    for (let i = 0; i < n; i++) {
-        vectorInputs += `<input type="text" name="xs_${i}" placeholder="xs[${i}]" required>`;
+    if (n < 2) {
+        alert('El número de puntos debe ser al menos 2');
+        return;
     }
 
-    vectorInputs += '<h3>Vector y</h3>';
+    let vectorInputs = '<div class="mb-3"><h5>Valores de X</h5>';
     for (let i = 0; i < n; i++) {
-        vectorInputs += `<input type="text" name="y_${i}" placeholder="y[${i}]" required>`;
+        vectorInputs += `
+            <div class="input-group mb-2">
+                <span class="input-group-text">x${i}</span>
+                <input type="number" class="form-control" name="xs_${i}" step="any" required>
+            </div>`;
     }
+    vectorInputs += '</div>';
+
+    vectorInputs += '<div class="mb-3"><h5>Valores de Y</h5>';
+    for (let i = 0; i < n; i++) {
+        vectorInputs += `
+            <div class="input-group mb-2">
+                <span class="input-group-text">y${i}</span>
+                <input type="number" class="form-control" name="y_${i}" step="any" required>
+            </div>`;
+    }
+    vectorInputs += '</div>';
 
     document.getElementById('vectorInputs').innerHTML = vectorInputs;
 }
